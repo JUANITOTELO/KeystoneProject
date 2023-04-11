@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "362497299363",
+    "project_id": "gps-pet-track3r",
+    "storage_bucket": "gps-pet-track3r.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362497299363:android:fd48cdc448488016e40016",
+        "android_client_info": {
+          "package_name": "com.keystone.gpspettracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "362497299363-ivg3gd744rn71p0tmtkroktvc0j8ec3m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApx9UZBJ5X-C3eL7MsST9N4Cv9EYCV3sY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "362497299363-ivg3gd744rn71p0tmtkroktvc0j8ec3m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
