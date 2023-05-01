@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,19 +43,27 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      print('User registered: ${userCredential.user!.uid}');
+      if (kDebugMode) {
+        print('User registered: ${userCredential.user!.uid}');
+      }
       Fluttertoast.showToast(msg: 'Registration successful');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        if (kDebugMode) {
+          print('The password provided is too weak.');
+        }
         Fluttertoast.showToast(msg: 'The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        if (kDebugMode) {
+          print('The account already exists for that email.');
+        }
         Fluttertoast.showToast(
             msg: 'The account already exists for that email.');
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
       Fluttertoast.showToast(msg: 'Error: $e');
     }
 

@@ -32,7 +32,8 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('You are logged in'),
+            Text(
+                'You are logged in as ${FirebaseAuth.instance.currentUser!.email}'),
             ElevatedButton(
               onPressed: _logout,
               child: const Text('Logout'),
