@@ -1,3 +1,4 @@
 {
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "cmake.sourceDirectory": "/home/hto/Documents/University/2023-01/Keystone/gpspettracker/linux/flutter"
 }

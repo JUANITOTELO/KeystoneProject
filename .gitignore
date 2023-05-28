@@ -45,3 +45,4 @@ app.*.map.json
 
 # Firebase ids
 firebase_ids.txt
+.vscode/settings.json
