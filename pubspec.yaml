@@ -41,8 +41,11 @@ dependencies:
   shared_preferences: ^2.1.0
   firebase_database: ^10.2.1
   flutter_map: ^4.0.0
+  latlong2: ^0.8.2
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -94,3 +97,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 19 # android min sdk min:16, default 21

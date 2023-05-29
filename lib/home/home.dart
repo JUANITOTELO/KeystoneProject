@@ -1,17 +1,21 @@
 // Path: lib/home/home.dart
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   DatabaseReference gpsRef = FirebaseDatabase.instance.ref(
       "users/${FirebaseAuth.instance.currentUser!.uid}/gps/${DateTime.now().day}${DateTime.now().month}${DateTime.now().year}");
   DatabaseReference lockRef = FirebaseDatabase.instance
@@ -63,10 +67,18 @@ class _HomePageState extends State<HomePage> {
     ref.onValue.listen((event) {
       Map<Object?, Object?> myMap =
           event.snapshot.value as Map<Object?, Object?>;
+      List<int> mykeys = [];
+      myMap.forEach((key, value) {
+        mykeys.add(int.parse(key.toString()));
+      });
+      mykeys.sort();
       setState(() {
-        coordinates = myMap.entries
-            .map((entry) => '${entry.key}:${entry.value}')
-            .toList();
+        List<String> temp = [];
+        for (var e in mykeys) {
+          // '${entry.key}:${entry.value}'
+          temp.add("$e:${myMap[e.toString()]}");
+        }
+        coordinates = temp;
       });
     });
   }
@@ -79,32 +91,58 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Home Page'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-                'You are logged in as ${FirebaseAuth.instance.currentUser!.email}'),
-            ElevatedButton(
-              onPressed: _logout,
-              child: const Text('Logout'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _lockButton(lockRef);
-              },
-              child: Text(lockStatus ? 'Unlock' : 'Lock'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: screenHeight * 0.5,
-                  width: screenWidth,
-                  child: CoordinatesList(
-                    items: coordinates,
-                  )),
-            ),
-          ],
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        physics: const BouncingScrollPhysics(),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Hi ${FirebaseAuth.instance.currentUser!.email}'),
+                    ElevatedButton(
+                      onPressed: _logout,
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: SizedBox(
+                    width: screenWidth,
+                    height: screenHeight * 0.35,
+                    child: MapWidget(
+                      items: coordinates,
+                    ),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _lockButton(lockRef);
+                },
+                child: Text(lockStatus ? 'Unlock' : 'Lock'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                    height: screenHeight * 0.25,
+                    width: screenWidth,
+                    child: CoordinatesList(
+                      items: coordinates,
+                    )),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -131,6 +169,62 @@ class _CoordinatesListState extends State<CoordinatesList> {
               "Latitude: ${widget.items[index].split(':')[1].split(',')[0]}\nLongitude: ${widget.items[index].split(':')[1].split(',')[1]}"),
         );
       },
+    );
+  }
+}
+
+class MapWidget extends StatefulWidget {
+  final List<String> items;
+  const MapWidget({Key? key, required this.items}) : super(key: key);
+
+  @override
+  State<MapWidget> createState() => _MapWidgetState();
+}
+
+class _MapWidgetState extends State<MapWidget> {
+  @override
+  Widget build(BuildContext context) {
+    double y = double.parse(widget.items[0].split(':')[1].split(',')[1]);
+    double x = double.parse(widget.items[0].split(':')[1].split(',')[0]);
+    return FlutterMap(
+      options: MapOptions(
+          center: LatLng(x, y),
+          zoom: 15,
+          maxZoom: 18,
+          minZoom: 9,
+          interactiveFlags: InteractiveFlag.pinchZoom |
+              InteractiveFlag.drag |
+              InteractiveFlag.doubleTapZoom |
+              InteractiveFlag.flingAnimation |
+              InteractiveFlag.rotate,
+          keepAlive: true,
+          rotationThreshold: 0.5),
+      nonRotatedChildren: const [
+        RichAttributionWidget(
+          attributions: [
+            TextSourceAttribution('OpenStreetMap contributors'),
+          ],
+        ),
+      ],
+      children: [
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.example.app',
+        ),
+        PolylineLayer(
+          polylines: [
+            Polyline(
+              points: widget.items
+                  .map((e) => LatLng(
+                      double.parse(e.split(':')[1].split(',')[0]),
+                      double.parse(e.split(':')[1].split(',')[1])))
+                  .toList(),
+              strokeWidth: 4.0,
+              color: Colors.purple,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
